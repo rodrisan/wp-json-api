@@ -7,7 +7,7 @@ Version: 1.1.1
 Author: Dan Phiffer
 Author URI: http://phiffer.org/
 */
-
+header("Access-Control-Allow-Origin: *");
 $dir = json_api_dir();
 @include_once "$dir/singletons/api.php";
 @include_once "$dir/singletons/query.php";

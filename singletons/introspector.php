@@ -108,7 +108,7 @@ class JSON_API_Introspector {
   
   public function get_current_category() {
     global $json_api;
-    extract($json_api->query->get(array('id', 'slug', 'category_id', 'category_slug')));
+    extract($json_api->query->get(array('id', 'slug', 'category_id', 'category_slug', 'term_id', 'term_slug', 'taxonomy')));
     if ($id || $category_id) {
       if (!$id) {
         $id = $category_id;
@@ -119,12 +119,26 @@ class JSON_API_Introspector {
         $slug = $category_slug;
       }
       return $this->get_category_by_slug($slug);
+    } else if ($term_slug) {
+      return $this->get_term_by_slug($term_slug, $taxonomy);
     } else {
       $json_api->error("Include 'id' or 'slug' var in your request.");
     }
     return null;
   }
   
+  public function get_current_term() {
+    global $json_api;
+    extract($json_api->query->get(array('term_slug', 'taxonomy')));
+    if ($term_slug) {
+      return $this->get_term_by_slug($term_slug, $taxonomy);
+    } else {
+      $json_api->error("Include 'id' or 'slug' var in your request.");
+    }
+    return null;
+  }
+  
+
   public function get_category_by_id($category_id) {
     $wp_category = get_term_by('id', $category_id, 'category');
     return $this->get_category_object($wp_category);
@@ -133,6 +147,13 @@ class JSON_API_Introspector {
   public function get_category_by_slug($category_slug) {
     $wp_category = get_term_by('slug', $category_slug, 'category');
     return $this->get_category_object($wp_category);
+  }
+  
+  public function get_term_by_slug($term_slug, $taxonomy) {
+    $wp_category = get_term_by('slug', $term_slug, $taxonomy);
+    $object = $this->get_category_object($wp_category);
+    $object->taxonomy = $taxonomy;
+    return $object;
   }
   
   public function get_tags() {
